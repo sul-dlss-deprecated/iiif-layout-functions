@@ -44,9 +44,7 @@
 /* 0 */
 /***/ function(module, exports) {
 
-	'use strict';
-
-	var manifestLayout = function(options) {
+	manifestLayout = function(options) {
 	  var maxCanvasHeight = options.maxCanvasHeight || 130, // screen pixels
 	      maxCanvasWidth = options.maxCanvasWidth ||  30, // screen pixels
 	      minCanvasWidth = options.minCanvasWidth ||  30,  // screen pixels
@@ -729,8 +727,6 @@
 	  };
 
 	};
-
-	module.exports = manifestLayout;
 
 
 /***/ }
