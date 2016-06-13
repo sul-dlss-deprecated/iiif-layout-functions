@@ -22,6 +22,9 @@
     "url": "https://github.com/sul-dlss/iiif-layout-functions/issues"
   },
   "homepage": "https://github.com/sul-dlss/iiif-layout-functions#readme",
+  "dependencies": {
+    "etch": "https://github.com/edsilv/etch.git#dev"
+  },
   "devDependencies": {
     "babel-core": "^6.8.0",
     "babel-loader": "^6.2.4",
