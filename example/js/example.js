@@ -273,81 +273,81 @@ function renderLayoutDiagram(elemId, layout) {
 
 }
 
-setTimeout(function() {
-  var totalHeaderHeight = 0,
-      windowCache = $(window),
-      cloneContainer = $('<div class="cloneContainer"></div>').appendTo('body');
+// setTimeout(function() {
+//   var totalHeaderHeight = 0,
+//       windowCache = $(window),
+//       cloneContainer = $('<div class="cloneContainer"></div>').appendTo('body');
 
-      cloneContainer.css({
-        position: 'fixed',
-        top: 0,
-        background: 'white',
-        width: '100%'
-      });
+//       cloneContainer.css({
+//         position: 'fixed',
+//         top: 0,
+//         background: 'white',
+//         width: '100%'
+//       });
 
-      var headingCache = $('h2,h3,h4,h5').toArray().map(function(heading) {
-        var $heading = $(heading),
-            clone = $heading.clone().appendTo('.cloneContainer');
+//       var headingCache = $('h2,h3,h4,h5').toArray().map(function(heading) {
+//         var $heading = $(heading),
+//             clone = $heading.clone().appendTo('.cloneContainer');
 
-        clone.css({
-          top: 0,
-          display: 'none',
-          background: 'white',
-          position: 'absolute',
-          width: '100%'
-        });
+//         clone.css({
+//           top: 0,
+//           display: 'none',
+//           background: 'white',
+//           position: 'absolute',
+//           width: '100%'
+//         });
 
-        return {
-          type: $heading.prev().prop('nodeName'),
-          top: $heading.position().top,
-          bottom: $heading.position().top + $heading.outerHeight(),
-          height: $heading.outerHeight(),
-          realElement: $heading,
-          dummyElement: clone,
-          stuck: false
-        };
-      });
+//         return {
+//           type: $heading.prev().prop('nodeName'),
+//           top: $heading.position().top,
+//           bottom: $heading.position().top + $heading.outerHeight(),
+//           height: $heading.outerHeight(),
+//           realElement: $heading,
+//           dummyElement: clone,
+//           stuck: false
+//         };
+//       });
 
-  var updateClones = function(headingCache, scrollTop) {
-    headingCache.forEach(function(heading){
-      if (heading.stuck) {
-        if (scrollTop + totalHeaderHeight < heading.bottom) {
-          heading.dummyElement.css('display', 'none');
-          heading.stuck = false;
-          totalHeaderHeight -= heading.height;
-        }
-      } else {
-        if ((scrollTop + totalHeaderHeight) > heading.top) {
+//   var updateClones = function(headingCache, scrollTop) {
+//     headingCache.forEach(function(heading){
+//       if (heading.stuck) {
+//         if (scrollTop + totalHeaderHeight < heading.bottom) {
+//           heading.dummyElement.css('display', 'none');
+//           heading.stuck = false;
+//           totalHeaderHeight -= heading.height;
+//         }
+//       } else {
+//         if ((scrollTop + totalHeaderHeight) > heading.top) {
 
-          heading.dummyElement.css({
-            display: 'block',
-            top: totalHeaderHeight
-          });
+//           heading.dummyElement.css({
+//             display: 'block',
+//             top: totalHeaderHeight
+//           });
 
-          if (!heading.stuck) {
-            heading.stuck = true;
-            totalHeaderHeight += heading.height;
-          }
-        } else {
+//           if (!heading.stuck) {
+//             heading.stuck = true;
+//             totalHeaderHeight += heading.height;
+//           }
+//         } else {
 
-          heading.dummyElement.css('display', 'none');
+//           heading.dummyElement.css('display', 'none');
 
-          if (heading.stuck) {
-            heading.stuck = false;
-            totalHeaderHeight -= heading.height;
-          }
-        }
-      }
-    });
-  };
+//           if (heading.stuck) {
+//             heading.stuck = false;
+//             totalHeaderHeight -= heading.height;
+//           }
+//         }
+//       }
+//     });
+//   };
 
-  $(window).on('scroll', function(event) {
-    // If scrollHeight is past the top of
-    // an h1 tag, clone it and stick the clone.
-    // Then increase the header height.
-    updateClones(
-      headingCache,
-      windowCache.scrollTop()
-    );
-  });
-}, 1000);
+//   $(window).on('scroll', function(event) {
+//     // If scrollHeight is past the top of
+//     // an h1 tag, clone it and stick the clone.
+//     // Then increase the header height.
+//     updateClones(
+//       headingCache,
+//       windowCache.scrollTop()
+//     );
+//   });
+// }, 1000);
