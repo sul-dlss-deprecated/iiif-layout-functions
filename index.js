@@ -435,7 +435,7 @@
 	    }), viewingMode, viewingDirection, framePadding, facingCanvasPadding);
 
 	    frames = fixedHeightAlign(frames, viewport.paddedWidth);
-	    frames = alignToAnchor(frames, anchor);
+	    // frames = alignToAnchor(frames, anchor);
 	    frames = updateCanvases(frames);
 	    return frames;
 	  }
@@ -463,7 +463,7 @@
 	      x += frame.width;
 	    });
 
-	    frames = alignToAnchor(frames, anchor);
+	    // frames = alignToAnchor(frames, anchor);
 	    frames = updateCanvases(frames);
 	    frames = intermediateLayoutHorizontal(frames);
 	    return frames;
@@ -692,8 +692,10 @@
 	    return paddedVantage;
 	  }
 
-	  function getBoundingBoxForCanvases(selectedCanvases) {
-	  }
+	  // Intended for framing any number of canvases (a range),
+	  // instead of only two.
+	  // function getBoundingBoxForCanvases(selectedCanvases) {
+	  // }
 
 	  function getFacingCanvas(canvas, frames) {
 	    var selectedIndex;
@@ -715,17 +717,12 @@
 	    }
 	  }
 
-	  function indicesOfParentLine(selectedCanvas) {
-	  }
-
-
 	  return {
 	    overview: overviewLayout,
 	    intermediate: intermediateLayout,
 	    detail: detailLayout,
 	    viewport: viewport
 	  };
-
 	};
 
 

@@ -1,4 +1,3 @@
-
 var __extends = (this && this.__extends) || function (d, b) {
   for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
   function __() { this.constructor = d; }
@@ -19,14 +18,14 @@ var MainScene = (function(_super){
 
 var Mover = (function(_super){
   __extends(Mover, _super);
-  
+
   function Mover() {
     _super.apply(this, arguments);
   }
 
   Mover.prototype.init = function(drawTo, drawFrom) {
     _super.prototype.init.call(this, drawTo, drawFrom);
-  }
+  };
 
   Mover.prototype.setup = function() {
     // this.width = 30;
@@ -34,29 +33,29 @@ var Mover = (function(_super){
 
     this.position = new Vector(0,0).toPoint();
     this.velocity = new Vector(0,0);
-  }
-  
+  };
+
   Mover.prototype.update = function() {
     _super.prototype.update.call(this);
 
     var p = this.position.toVector();
 
     var deltaVelocity = new Vector(this.velocity.x * this.deltaTime, this.velocity.y * this.deltaTime);
-    
+
     p.add(deltaVelocity);
 
-    if (p.x > this.canvasWidth) {
-      p.x = 0;
-    } else if (p.x < 0) {
-      p.x = this.canvasWidth;
-    } if (p.y > this.canvasHeight) {
-      p.y = 0;
-    } else if (p.y < 0) {
-      p.y = this.canvasHeight;
-    }
+    // if (p.x > this.canvasWidth) {
+    //   p.x = 0;
+    // } else if (p.x < 0) {
+    //   p.x = this.canvasWidth;
+    // } if (p.y > this.canvasHeight) {
+    //   p.y = 0;
+    // } else if (p.y < 0) {
+    //   p.y = this.canvasHeight;
+    // }
 
     this.position = p.toPoint();
-  }
+  };
 
   Mover.prototype.draw = function() {
     _super.prototype.draw.call(this);
@@ -75,7 +74,7 @@ var Mover = (function(_super){
       // draw each frame
       this.drawToCtx(this.ctx);
     }
-  }
+  };
 
   Mover.prototype.drawToCtx = function(ctx) {
     ctx.moveTo(this.position.x, this.position.y);
@@ -100,7 +99,7 @@ var Mover = (function(_super){
     // }
     ctx.closePath();
     ctx.fill();
-  }
+  };
 
   return Mover;
 
@@ -108,16 +107,15 @@ var Mover = (function(_super){
 
 $(function(){
   var manifest = $.getJSON('http://dms-data.stanford.edu/data/manifests/BnF/jr903ng8662/manifest.json', function(json) {
-    var layout = manifestLayout({
+    var leftToRightIndividualsLayouts = manifestLayout({
       canvases: json.sequences[0].canvases,
-      width: canvas.width,
-      height: canvas.height,
-      // scaleFactor: userState.scaleFactor,
-      // viewingDirection: userState.viewingDirection,
-      // viewingMode: userState.viewingMode,
+      width: window.innerWidth,
+      height: window.innerHeight,
+      viewingDirection: 'left-to-right',
+      viewingMode: 'individuals',
       canvasHeight: 100,
       canvasWidth: 100,
-      // selectedCanvas: userState.selectedCanvas,
+      selectedCanvas: json.sequences[0].canvases[5]['@id'],
       framePadding: {
         top: 10,
         bottom: 40,
@@ -126,40 +124,230 @@ $(function(){
       },
       minimumImageGap: 5, // precent of viewport
       facingCanvasPadding: 0.1 // precent of viewport
-    }).overview();
-
-    console.log(layout.length);
-    layout.forEach(function(frame) {
-      console.log(frame);
-      var x  = frame.canvas.x,
-          y = frame.canvas.y,
-          width = frame.canvas.width,
-          height = frame.canvas.height;
-
-      var mover = new Mover();
-      mover.init(mainScene);
-      mainScene.displayList.add(mover);
-      mover.position.x = x/2;
-      mover.position.y = y/2;
-      mover.width = width/2;
-      mover.height = height/2;
     });
+
+    renderLayoutDiagram('left-right-individuals-overview',
+                        leftToRightIndividualsLayouts.overview());
+    renderLayoutDiagram('left-right-individuals-intermediate',
+                        leftToRightIndividualsLayouts.intermediate());
+    renderLayoutDiagram('left-right-individuals-detail',
+                        leftToRightIndividualsLayouts.detail());
+
+
+    var leftToRightPagedLayouts = manifestLayout({
+      canvases: json.sequences[0].canvases,
+      width: window.innerWidth,
+      height: window.innerHeight,
+      viewingDirection: 'left-to-right',
+      viewingMode: 'paged',
+      canvasHeight: 100,
+      canvasWidth: 100,
+      selectedCanvas: json.sequences[0].canvases[5]['@id'],
+      framePadding: {
+        top: 10,
+        bottom: 40,
+        left: 10,
+        right: 10
+      },
+      minimumImageGap: 5, // precent of viewport
+      facingCanvasPadding: 0.1 // precent of viewport
+    });
+
+    renderLayoutDiagram('left-right-paged-overview',
+                        leftToRightPagedLayouts.overview());
+    renderLayoutDiagram('left-right-paged-intermediate',
+                        leftToRightPagedLayouts.intermediate());
+    renderLayoutDiagram('left-right-paged-detail',
+                        leftToRightPagedLayouts.detail());
+
+    var leftToRightContinuousLayouts = manifestLayout({
+      canvases: json.sequences[0].canvases,
+      width: window.innerWidth,
+      height: window.innerHeight,
+      // viewingDirection: userState.viewingDirection,
+      viewingMode: 'continuous',
+      canvasHeight: 100,
+      canvasWidth: 100,
+      selectedCanvas: json.sequences[0].canvases[5]['@id'],
+      framePadding: {
+        top: 10,
+        bottom: 40,
+        left: 50,
+        right: 10
+      },
+      minimumImageGap: 5, // precent of viewport
+      facingCanvasPadding: 0.1 // precent of viewport
+    });
+
+    renderLayoutDiagram('left-right-continuous-overview',
+                        leftToRightContinuousLayouts.overview());
+    renderLayoutDiagram('left-right-continuous-intermediate',
+                        leftToRightContinuousLayouts.intermediate());
+    renderLayoutDiagram('left-right-continuous-detail',
+                        leftToRightContinuousLayouts.detail());
   });
 
-  var canvas = new etch.drawing.Canvas();
+});
+
+var getLayoutBoundingBox = function(layout) {
+
+  var maxX = -Infinity,
+      maxY = -Infinity,
+      minX = Infinity,
+      minY = Infinity;
+
+  layout.forEach(function(frame){
+    if ( frame.x < minX) minX = frame.x;
+    if ( frame.y < minY) minY = frame.y;
+    if ( frame.x + frame.width > maxX) {
+      maxX = frame.x + frame.width;
+    }
+    if ( frame.y + frame.height > maxY) {
+      maxY = frame.y + frame.height;
+    }
+  });
+
+  // Get a box that contains the topLeftmost
+  // topRightmost canvas of the selection.
+  // Will need to be updated for viewingDirections.
+
+  // Calculate a bounding box for the complete layout.
+  var layoutBBWidth = maxX + Math.abs(minX),
+      layoutBBHeight = maxY + Math.abs(minY);
+
+  return {
+    x: minX,
+    y: minY,
+    width: layoutBBWidth,
+    height: layoutBBHeight
+  };
+};
+
+function renderLayoutDiagram(elemId, layout) {
+  var canvas = new etch.drawing.Canvas(document.getElementById(elemId)),
+      canvasMargin = 20,
+      layoutBoundingBox = getLayoutBoundingBox(layout);
+
+  console.log(layoutBoundingBox);
+
   canvas.style.backgroundColor = '#FFF';
-  canvas.width = 1024;
-  canvas.height = 768;
+  canvas.width = 400;
+  canvas.height = canvas.width/(layoutBoundingBox.width/layoutBoundingBox.height);
+
+  if (canvas.height < 40) {
+    canvas.width = window.innerWidth -50;
+    canvas.height = canvas.width/(layoutBoundingBox.width/layoutBoundingBox.height) +
+      canvasMargin*2;
+  }
 
   var mainScene = new MainScene();
-
   mainScene.init(canvas);
 
-  mainScene.drawn.on((s, time) => {
-    //console.log(time);
-  }, this);
+  // This ensures we can view the entire sceneGraph
+  // in the example canvas as a kind of "minimap".
+  // The layout is a function of the aspect ratio
+  // of the viewport object, an optional anchor
+  // coordinate pair and the dimensions of the
+  // canvases themselves.
 
-  var moverCache = new etch.drawing.Canvas();
-  moverCache.hide();
+  var scaleFactor = (canvas.width - canvasMargin*2)/layoutBoundingBox.width;
 
-});
+  // Draw canvases
+  layout.forEach(function(frame) {
+    var x  = frame.canvas.x,
+        y = frame.canvas.y,
+        width = frame.canvas.width,
+        height = frame.canvas.height;
+
+    var mover = new Mover();
+    mover.init(mainScene);
+    mainScene.displayList.add(mover);
+    mover.position.x = (x + Math.abs(layoutBoundingBox.x))*scaleFactor + canvasMargin;
+    mover.position.y = (y + Math.abs(layoutBoundingBox.y))*scaleFactor + canvasMargin;
+    mover.width = width*scaleFactor;
+    mover.height = height*scaleFactor;
+  });
+
+
+  // Draw viewport
+
+}
+
+setTimeout(function() {
+  var totalHeaderHeight = 0,
+      windowCache = $(window),
+      cloneContainer = $('<div class="cloneContainer"></div>').appendTo('body');
+
+      cloneContainer.css({
+        position: 'fixed',
+        top: 0,
+        background: 'white',
+        width: '100%'
+      });
+
+      var headingCache = $('h2,h3,h4,h5').toArray().map(function(heading) {
+        var $heading = $(heading),
+            clone = $heading.clone().appendTo('.cloneContainer');
+
+        clone.css({
+          top: 0,
+          display: 'none',
+          background: 'white',
+          position: 'absolute',
+          width: '100%'
+        });
+
+        return {
+          type: $heading.prev().prop('nodeName'),
+          top: $heading.position().top,
+          bottom: $heading.position().top + $heading.outerHeight(),
+          height: $heading.outerHeight(),
+          realElement: $heading,
+          dummyElement: clone,
+          stuck: false
+        };
+      });
+
+  var updateClones = function(headingCache, scrollTop) {
+    headingCache.forEach(function(heading){
+      if (heading.stuck) {
+        if (scrollTop + totalHeaderHeight < heading.bottom) {
+          heading.dummyElement.css('display', 'none');
+          heading.stuck = false;
+          totalHeaderHeight -= heading.height;
+        }
+      } else {
+        if ((scrollTop + totalHeaderHeight) > heading.top) {
+
+          heading.dummyElement.css({
+            display: 'block',
+            top: totalHeaderHeight
+          });
+
+          if (!heading.stuck) {
+            heading.stuck = true;
+            totalHeaderHeight += heading.height;
+          }
+        } else {
+
+          heading.dummyElement.css('display', 'none');
+
+          if (heading.stuck) {
+            heading.stuck = false;
+            totalHeaderHeight -= heading.height;
+          }
+        }
+      }
+    });
+  };
+
+  $(window).on('scroll', function(event) {
+    // If scrollHeight is past the top of
+    // an h1 tag, clone it and stick the clone.
+    // Then increase the header height.
+    updateClones(
+      headingCache,
+      windowCache.scrollTop()
+    );
+  });
+}, 1000);
