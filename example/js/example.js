@@ -33,6 +33,8 @@ var Mover = (function(_super){
 
     this.position = new Vector(0,0).toPoint();
     this.velocity = new Vector(0,0);
+    this.type = 'canvas';
+    this.selected = false;
   };
 
   Mover.prototype.update = function() {
@@ -78,17 +80,9 @@ var Mover = (function(_super){
 
   Mover.prototype.drawToCtx = function(ctx) {
     ctx.moveTo(this.position.x, this.position.y);
-    ctx.fillStyle = "#FF00FF";
-    ctx.beginPath();
-    // if (this.drawFrom) {
-    //   ctx.beginPath();
-    //   ctx.moveTo(this.width / 2, 0);
-    //   ctx.lineTo(this.width, this.height / 2);
-    //   ctx.lineTo(this.width / 2, this.height);
-    //   ctx.lineTo(0, this.height / 2);
-    //   ctx.closePath();
-    //   ctx.fill();
-    // } else {
+    ctx.fillStyle = this.selected ? 'deepPink' : 'cyan';
+    ctx.strokeStyle = this.type === 'canvas' ? 'black' : 'orangered';
+    if (this.type === 'canvas') {
       ctx.beginPath();
       ctx.moveTo(this.position.x, this.position.y);
       ctx.lineTo(this.position.x + this.width, this.position.y);
@@ -96,9 +90,13 @@ var Mover = (function(_super){
       ctx.lineTo(this.position.x, this.position.y + this.height);
       ctx.closePath();
       ctx.fill();
-    // }
-    ctx.closePath();
-    ctx.fill();
+    }
+    ctx.strokeRect(
+      this.position.x,
+      this.position.y,
+      this.width,
+      this.height
+    );
   };
 
   return Mover;
@@ -111,10 +109,11 @@ $(function(){
       canvases: json.sequences[0].canvases,
       width: window.innerWidth,
       height: window.innerHeight,
+      scaleFactor: 2,
       viewingDirection: 'left-to-right',
       viewingMode: 'individuals',
-      canvasHeight: 100,
-      canvasWidth: 100,
+      canvasHeight: 200,
+      canvasWidth: 200,
       selectedCanvas: json.sequences[0].canvases[5]['@id'],
       framePadding: {
         top: 10,
@@ -140,8 +139,8 @@ $(function(){
       height: window.innerHeight,
       viewingDirection: 'left-to-right',
       viewingMode: 'paged',
-      canvasHeight: 100,
-      canvasWidth: 100,
+      canvasHeight: 200,
+      canvasWidth: 200,
       selectedCanvas: json.sequences[0].canvases[5]['@id'],
       framePadding: {
         top: 10,
@@ -166,8 +165,8 @@ $(function(){
       height: window.innerHeight,
       // viewingDirection: userState.viewingDirection,
       viewingMode: 'continuous',
-      canvasHeight: 100,
-      canvasWidth: 100,
+      canvasHeight: 200,
+      canvasWidth: 200,
       selectedCanvas: json.sequences[0].canvases[5]['@id'],
       framePadding: {
         top: 10,
@@ -240,6 +239,11 @@ function renderLayoutDiagram(elemId, layout) {
       canvasMargin*2;
   }
 
+  if (canvas.height > window.innerHeight*0.8) {
+    canvas.height = window.innerHeight*0.8;
+    canvas.width = canvas.height/(layoutBoundingBox.height/layoutBoundingBox.width)+ canvasMargin*2;
+  }
+
   var mainScene = new MainScene();
   mainScene.init(canvas);
 
@@ -262,10 +266,11 @@ function renderLayoutDiagram(elemId, layout) {
     var mover = new Mover();
     mover.init(mainScene);
     mainScene.displayList.add(mover);
-    mover.position.x = (x + Math.abs(layoutBoundingBox.x))*scaleFactor + canvasMargin;
-    mover.position.y = (y + Math.abs(layoutBoundingBox.y))*scaleFactor + canvasMargin;
+    mover.position.x = (x + Math.abs(layoutBoundingBox.x))*scaleFactor + canvasMargin + 0.5;
+    mover.position.y = (y + Math.abs(layoutBoundingBox.y))*scaleFactor + canvasMargin +0.5;
     mover.width = width*scaleFactor;
     mover.height = height*scaleFactor;
+    mover.selected = frame.canvas.selected;
   });
 
 
