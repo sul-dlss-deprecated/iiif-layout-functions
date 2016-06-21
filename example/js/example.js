@@ -81,8 +81,53 @@ var Mover = (function(_super){
   Mover.prototype.drawToCtx = function(ctx) {
     ctx.moveTo(this.position.x, this.position.y);
     ctx.fillStyle = this.selected ? 'deepPink' : 'cyan';
-    ctx.strokeStyle = this.type === 'canvas' ? 'black' : 'orangered';
     if (this.type === 'canvas') {
+      ctx.fillStyle = this.selected ? 'deepPink' : 'cyan';
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = 1;
+
+      ctx.beginPath();
+      ctx.moveTo(this.position.x, this.position.y);
+      ctx.lineTo(this.position.x + this.width, this.position.y);
+      ctx.lineTo(this.position.x + this.width, this.position.y + this.height);
+      ctx.lineTo(this.position.x, this.position.y + this.height);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.strokeRect(
+        this.position.x,
+        this.position.y,
+        this.width,
+        this.height
+      );
+
+      var centerPoint = {
+        x:this.position.x + this.width/2,
+        y:this.position.y + this.height/2
+      };
+
+      // Add nunmbers.
+      ctx.font = "12px serif";
+      ctx.textBaseline = 'middle';
+      ctx.textAlign = "center";
+      ctx.strokeText(this.index, centerPoint.x, centerPoint.y);
+    }
+
+    if (this.type === 'frame') {
+      ctx.strokeStyle = '#d92fd9';
+      ctx.lineWidth = 1;
+
+      ctx.strokeRect(
+        this.position.x,
+        this.position.y,
+        this.width,
+        this.height
+      );
+    }
+
+    if (this.type === 'padding') {
+      ctx.fillStyle = 'darkgray';
+
       ctx.beginPath();
       ctx.moveTo(this.position.x, this.position.y);
       ctx.lineTo(this.position.x + this.width, this.position.y);
@@ -91,12 +136,18 @@ var Mover = (function(_super){
       ctx.closePath();
       ctx.fill();
     }
-    ctx.strokeRect(
-      this.position.x,
-      this.position.y,
-      this.width,
-      this.height
-    );
+
+    if (this.type === 'viewport') {
+      ctx.strokeStyle = 'orangered';
+      ctx.lineWidth = 2;
+
+      ctx.strokeRect(
+        this.position.x,
+        this.position.y,
+        this.width,
+        this.height
+      );
+    }
   };
 
   return Mover;
@@ -105,21 +156,51 @@ var Mover = (function(_super){
 
 $(function(){
   var manifest = $.getJSON('http://dms-data.stanford.edu/data/manifests/BnF/jr903ng8662/manifest.json', function(json) {
+    // framePaddingDiagram = immediateModeViewer({
+    //   canvases: json.sequences[0].canvases,
+    //   width: window.innerWidth,
+    //   height: window.innerHeight,
+    //   viewingDirection: 'left-to-right',
+    //   viewingMode: 'individuals',
+    //   canvasHeight: 200,
+    //   canvasWidth: 200,
+    //   selectedCanvas: json.sequences[0].canvases[20]['@id'],
+    //   framePadding: {
+    //     top: 10,
+    //     bottom: 40,
+    //     left: 10,
+    //     right: 10
+    //   },
+    //   viewportPadding: {
+    //     top: 0,
+    //     left: 0,
+    //     right: 0,
+    //     bottom: 0
+    //   },
+    //   minimumImageGap: 5, // precent of viewport
+    //   facingCanvasPadding: 0.1 // precent of viewport
+    // }, 'frame-padding-diagram');
+
     var leftToRightIndividualsLayouts = manifestLayout({
       canvases: json.sequences[0].canvases,
       width: window.innerWidth,
       height: window.innerHeight,
-      scaleFactor: 2,
       viewingDirection: 'left-to-right',
       viewingMode: 'individuals',
       canvasHeight: 200,
       canvasWidth: 200,
-      selectedCanvas: json.sequences[0].canvases[5]['@id'],
+      selectedCanvas: json.sequences[0].canvases[20]['@id'],
       framePadding: {
         top: 10,
         bottom: 40,
         left: 10,
         right: 10
+      },
+      viewportPadding: {
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0
       },
       minimumImageGap: 5, // precent of viewport
       facingCanvasPadding: 0.1 // precent of viewport
@@ -148,6 +229,12 @@ $(function(){
         left: 10,
         right: 10
       },
+      viewportPadding: {
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0
+      },
       minimumImageGap: 5, // precent of viewport
       facingCanvasPadding: 0.1 // precent of viewport
     });
@@ -163,7 +250,7 @@ $(function(){
       canvases: json.sequences[0].canvases,
       width: window.innerWidth,
       height: window.innerHeight,
-      // viewingDirection: userState.viewingDirection,
+      viewingDirection: 'left-to-right',
       viewingMode: 'continuous',
       canvasHeight: 200,
       canvasWidth: 200,
@@ -171,8 +258,14 @@ $(function(){
       framePadding: {
         top: 10,
         bottom: 40,
-        left: 50,
+        left: 10,
         right: 10
+      },
+      viewportPadding: {
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0
       },
       minimumImageGap: 5, // precent of viewport
       facingCanvasPadding: 0.1 // precent of viewport
@@ -184,6 +277,102 @@ $(function(){
                         leftToRightContinuousLayouts.intermediate());
     renderLayoutDiagram('left-right-continuous-detail',
                         leftToRightContinuousLayouts.detail());
+
+    var rightToLeftIndividualsLayouts = manifestLayout({
+      canvases: json.sequences[0].canvases,
+      width: window.innerWidth,
+      height: window.innerHeight,
+      viewingDirection: 'right-to-left',
+      viewingMode: 'individuals',
+      canvasHeight: 200,
+      canvasWidth: 200,
+      selectedCanvas: json.sequences[0].canvases[5]['@id'],
+      framePadding: {
+        top: 10,
+        bottom: 40,
+        left: 10,
+        right: 10
+      },
+      viewportPadding: {
+        top: 10,
+        left: 10,
+        right: 10,
+        bottom: 10
+      },
+      minimumImageGap: 5, // precent of viewport
+      facingCanvasPadding: 0.1 // precent of viewport
+    });
+
+    renderLayoutDiagram('right-left-individuals-overview',
+                        rightToLeftIndividualsLayouts.overview());
+    renderLayoutDiagram('right-left-individuals-intermediate',
+                        rightToLeftIndividualsLayouts.intermediate());
+    renderLayoutDiagram('right-left-individuals-detail',
+                        rightToLeftIndividualsLayouts.detail());
+
+    var rightToLeftPagedLayouts = manifestLayout({
+      canvases: json.sequences[0].canvases,
+      width: window.innerWidth,
+      height: window.innerHeight,
+      viewingDirection: 'right-to-left',
+      viewingMode: 'paged',
+      canvasHeight: 200,
+      canvasWidth: 200,
+      selectedCanvas: json.sequences[0].canvases[5]['@id'],
+      framePadding: {
+        top: 10,
+        bottom: 40,
+        left: 10,
+        right: 10
+      },
+      viewportPadding: {
+        top: 10,
+        left: 10,
+        right: 10,
+        bottom: 10
+      },
+      minimumImageGap: 5, // precent of viewport
+      facingCanvasPadding: 0.1 // precent of viewport
+    });
+
+    renderLayoutDiagram('right-left-paged-overview',
+                        rightToLeftPagedLayouts.overview());
+    renderLayoutDiagram('right-left-paged-intermediate',
+                        rightToLeftPagedLayouts.intermediate());
+    renderLayoutDiagram('right-left-paged-detail',
+                        rightToLeftPagedLayouts.detail());
+
+  var rightToLeftContinuousLayouts = manifestLayout({
+      canvases: json.sequences[0].canvases,
+      width: window.innerWidth,
+      height: window.innerHeight,
+      viewingDirection: 'right-to-left',
+      viewingMode: 'continuous',
+      canvasHeight: 200,
+      canvasWidth: 200,
+      selectedCanvas: json.sequences[0].canvases[5]['@id'],
+      framePadding: {
+        top: 10,
+        bottom: 40,
+        left: 10,
+        right: 10
+      },
+      viewportPadding: {
+        top: 10,
+        left: 10,
+        right: 10,
+        bottom: 10
+      },
+      minimumImageGap: 5, // precent of viewport
+      facingCanvasPadding: 0.1 // precent of viewport
+    });
+
+    renderLayoutDiagram('right-left-continuous-overview',
+                        rightToLeftContinuousLayouts.overview());
+    renderLayoutDiagram('right-left-continuous-intermediate',
+                        rightToLeftContinuousLayouts.intermediate());
+    renderLayoutDiagram('right-left-continuous-detail',
+                        rightToLeftContinuousLayouts.detail());
   });
 
 });
@@ -196,6 +385,19 @@ var getLayoutBoundingBox = function(layout) {
       minY = Infinity;
 
   layout.forEach(function(frame){
+    if (frame.vantage) {
+      var vantage = frame.vantage;
+      // Make sure we also contain the
+      // viewport box.
+      if (vantage.x < minX) minX = vantage.x;
+      if (vantage.y < minY) minY = vantage.y;
+      if (vantage.x + vantage.width > maxX) {
+        maxX = vantage.x + vantage.width;
+      }
+      if (vantage.y + vantage.height > maxY) {
+        maxY = vantage.y + vantage.height;
+      }
+    }
     if ( frame.x < minX) minX = frame.x;
     if ( frame.y < minY) minY = frame.y;
     if ( frame.x + frame.width > maxX) {
@@ -222,12 +424,17 @@ var getLayoutBoundingBox = function(layout) {
   };
 };
 
+function renderFrameDiagram(elemId, layout) {
+}
+
+function renderViewportDiagram(elemId, layout) {
+}
+
 function renderLayoutDiagram(elemId, layout) {
   var canvas = new etch.drawing.Canvas(document.getElementById(elemId)),
       canvasMargin = 20,
-      layoutBoundingBox = getLayoutBoundingBox(layout);
-
-  console.log(layoutBoundingBox);
+      layoutBoundingBox = getLayoutBoundingBox(layout),
+      scaleFactor;
 
   canvas.style.backgroundColor = '#FFF';
   canvas.width = 400;
@@ -239,12 +446,13 @@ function renderLayoutDiagram(elemId, layout) {
       canvasMargin*2;
   }
 
-  if (canvas.height > window.innerHeight*0.8) {
-    canvas.height = window.innerHeight*0.8;
-    canvas.width = canvas.height/(layoutBoundingBox.height/layoutBoundingBox.width)+ canvasMargin*2;
-  }
+  scaleFactor = (canvas.width - canvasMargin*2)/layoutBoundingBox.width;
+  // if (canvas.height > window.innerHeight*0.8) {
+  //   canvas.height = window.innerHeight*0.8;
+  //   canvas.width = canvas.width*(layoutBoundingBox.width/layoutBoundingBox.height);
+  // }
 
-  var mainScene = new MainScene();
+  mainScene = new MainScene();
   mainScene.init(canvas);
 
   // This ensures we can view the entire sceneGraph
@@ -254,105 +462,101 @@ function renderLayoutDiagram(elemId, layout) {
   // coordinate pair and the dimensions of the
   // canvases themselves.
 
-  var scaleFactor = (canvas.width - canvasMargin*2)/layoutBoundingBox.width;
 
-  // Draw canvases
-  layout.forEach(function(frame) {
+  addCanvases(layout, layoutBoundingBox, scaleFactor, canvasMargin, mainScene);
+  // if (showFrames) {
+    addFrames(layout, layoutBoundingBox, scaleFactor, canvasMargin, mainScene);
+  // }
+  // if (showViewport) {
+    addViewport(layout, layoutBoundingBox, scaleFactor, canvasMargin, mainScene);
+  // }
+  // if (showNumbers) {
+  // }
+}
+
+function addCanvases(layout, layoutBoundingBox, scaleFactor, canvasMargin, mainScene) {
+  layout.forEach(function(frame, index) {
     var x  = frame.canvas.x,
         y = frame.canvas.y,
         width = frame.canvas.width,
         height = frame.canvas.height;
 
-    var mover = new Mover();
-    mover.init(mainScene);
-    mainScene.displayList.add(mover);
-    mover.position.x = (x + Math.abs(layoutBoundingBox.x))*scaleFactor + canvasMargin + 0.5;
-    mover.position.y = (y + Math.abs(layoutBoundingBox.y))*scaleFactor + canvasMargin +0.5;
-    mover.width = width*scaleFactor;
-    mover.height = height*scaleFactor;
-    mover.selected = frame.canvas.selected;
+    var canvas = new Mover();
+    canvas.init(mainScene);
+    mainScene.displayList.add(canvas);
+    canvas.position.x = (x + Math.abs(layoutBoundingBox.x))*scaleFactor + canvasMargin;
+    canvas.position.y = (y + Math.abs(layoutBoundingBox.y))*scaleFactor + canvasMargin;
+    canvas.width = width*scaleFactor;
+    canvas.height = height*scaleFactor;
+    canvas.selected = frame.canvas.selected;
+    canvas.type = 'canvas';
+    canvas.showNumbers = true;
+    canvas.index = frame.canvas.sequencePosition;
   });
-
-
-  // Draw viewport
-
 }
 
-// setTimeout(function() {
-//   var totalHeaderHeight = 0,
-//       windowCache = $(window),
-//       cloneContainer = $('<div class="cloneContainer"></div>').appendTo('body');
+function addFrames(layout, layoutBoundingBox, scaleFactor, canvasMargin, mainScene) {
+  layout.forEach(function(frame) {
+    var x  = frame.x,
+        y = frame.y,
+        width = frame.width,
+        height = frame.height;
 
-//       cloneContainer.css({
-//         position: 'fixed',
-//         top: 0,
-//         background: 'white',
-//         width: '100%'
-//       });
+    var canvasFrame = new Mover();
+    canvasFrame.init(mainScene);
+    mainScene.displayList.add(canvasFrame);
 
-//       var headingCache = $('h2,h3,h4,h5').toArray().map(function(heading) {
-//         var $heading = $(heading),
-//             clone = $heading.clone().appendTo('.cloneContainer');
+    canvasFrame.position.x = (x + Math.abs(layoutBoundingBox.x))*scaleFactor + canvasMargin;
+    canvasFrame.position.y = (y + Math.abs(layoutBoundingBox.y))*scaleFactor + canvasMargin;
+    canvasFrame.width = width*scaleFactor;
+    canvasFrame.height = height*scaleFactor;
+    canvasFrame.selected = frame.canvas.selected;
+    canvasFrame.type = 'frame';
+  });
+}
 
-//         clone.css({
-//           top: 0,
-//           display: 'none',
-//           background: 'white',
-//           position: 'absolute',
-//           width: '100%'
-//         });
+function addViewport(layout, layoutBoundingBox, scaleFactor, canvasMargin, mainScene) {
+  var selectedCanvas = layout.filter(function(frame) {
+    return frame.canvas.selected;
+  });
 
-//         return {
-//           type: $heading.prev().prop('nodeName'),
-//           top: $heading.position().top,
-//           bottom: $heading.position().top + $heading.outerHeight(),
-//           height: $heading.outerHeight(),
-//           realElement: $heading,
-//           dummyElement: clone,
-//           stuck: false
-//         };
-//       });
+  selectedCanvas.forEach(function(frame) {
+    var viewport = new Mover();
+    viewport.init(mainScene);
+    mainScene.displayList.add(viewport);
 
-//   var updateClones = function(headingCache, scrollTop) {
-//     headingCache.forEach(function(heading){
-//       if (heading.stuck) {
-//         if (scrollTop + totalHeaderHeight < heading.bottom) {
-//           heading.dummyElement.css('display', 'none');
-//           heading.stuck = false;
-//           totalHeaderHeight -= heading.height;
-//         }
-//       } else {
-//         if ((scrollTop + totalHeaderHeight) > heading.top) {
+    viewport.position.x = (frame.vantage.x + Math.abs(layoutBoundingBox.x))*scaleFactor + canvasMargin;
+    viewport.position.y = (frame.vantage.y + Math.abs(layoutBoundingBox.y))*scaleFactor + canvasMargin;
+    viewport.width = frame.vantage.width*scaleFactor;
+    viewport.height = frame.vantage.height*scaleFactor;
+    viewport.type = 'viewport';
+  });
+}
 
-//           heading.dummyElement.css({
-//             display: 'block',
-//             top: totalHeaderHeight
-//           });
+function immediateModeViewer(container, layoutParams, mode) {
+  var scene;
 
-//           if (!heading.stuck) {
-//             heading.stuck = true;
-//             totalHeaderHeight += heading.height;
-//           }
-//         } else {
+  function init() {
+    renderLayoutDiagram(container, manifestLayout(layout).overview());
+  }
+  function framePadding(framePadding) {
+    if (arguments.length !== 0) {
+      layout.framePadding = framePadding;
+      render();
+    }
+    return layout;
+  }
+  function perspective() {}
+  function selectedCanvas() {}
+  function readingDirection() {}
+  function viewportPadding() {}
+  function render() {
+  }
 
-//           heading.dummyElement.css('display', 'none');
+  init();
 
-//           if (heading.stuck) {
-//             heading.stuck = false;
-//             totalHeaderHeight -= heading.height;
-//           }
-//         }
-//       }
-//     });
-//   };
-
-//   $(window).on('scroll', function(event) {
-//     // If scrollHeight is past the top of
-//     // an h1 tag, clone it and stick the clone.
-//     // Then increase the header height.
-//     updateClones(
-//       headingCache,
-//       windowCache.scrollTop()
-//     );
-//   });
-// }, 1000);
+  return {
+    framePadding: framePadding,
+    render: render
+  };
+}

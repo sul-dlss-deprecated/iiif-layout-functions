@@ -266,9 +266,9 @@ manifestLayout = function(options) {
   }
 
   /**
-  * Determines a facing page type
-  * @returns {String}
-  */
+   * Determines a facing page type
+   * @returns {String}
+   */
   function facingPageType(index) {
     if (index === 0) {
       return 'firstPage';
@@ -391,6 +391,11 @@ manifestLayout = function(options) {
     frames = fixedHeightAlign(frames, viewport.paddedWidth);
     // frames = alignToAnchor(frames, anchor);
     frames = updateCanvases(frames);
+    var selectedFrame = frames.filter(function(frame) {
+      return frame.canvas.selected;
+    })[0];
+
+    selectedFrame.vantage = getOverviewVantage(frames);
     return frames;
   }
 
@@ -418,7 +423,7 @@ manifestLayout = function(options) {
     });
 
     // frames = alignToAnchor(frames, anchor);
-    frames = updateCanvases(frames);
+    updateCanvases(frames);
     frames = intermediateLayoutHorizontal(frames);
     return frames;
   }
@@ -430,17 +435,17 @@ manifestLayout = function(options) {
   }
 
   function intermediateLayoutHorizontal(frames) {
-    var selectedFrames = frames.filter(function(frame) {
+    var selectedFrame = frames.filter(function(frame) {
       return frame.canvas.selected;
-    });
+    })[0];
 
-    var selectedFrame = selectedFrames[0];
     var facingCanvas = getFacingCanvas(selectedFrame.canvas, frames);
     var canvasPosition = selectedFrame.canvas.sequencePosition;
     selectedFrame.vantage = getVantageForCanvas(selectedFrame.canvas, facingCanvas);
 
     if (viewingMode !== 'continuous') {
       frames.forEach(function(frame, index, allFrames) {
+        // These canvases are on the same row as the selected canvas(es), but not selected.
         if (frame.y === selectedFrame.y && frame.canvas.id !== selectedFrame.canvas.id) {
           if (viewingMode === 'paged' && frame.canvas.id === facingCanvas.id) {
             return;
@@ -448,25 +453,100 @@ manifestLayout = function(options) {
           // These are the canvases within the same line of the overview layout.
           if (index < canvasPosition) {
             // Those to the left. Push them to the left, out of frame.
-            frame.x = frame.x - (selectedFrame.vantage.leftMargin + framePadding.right*2);
+            frame.x = frame.x - (selectedFrame.vantage.leftMargin + framePadding.left);
           } else {
             // Those to the right. Push them to the right, out of frame.
-            frame.x = frame.x + (selectedFrame.vantage.rightMargin + framePadding.left*2);
+            frame.x = frame.x + (selectedFrame.vantage.rightMargin + framePadding.right);
           }
         } else if (frame.y > selectedFrame.y) {
           // These are all the canvases below the selected canvas
           // in the overview layout. Push then down out of frame.
-          frame.y = frame.y + (selectedFrame.vantage.topMargin + framePadding.bottom*2);
+          frame.y = frame.y + (selectedFrame.vantage.bottomMargin + framePadding.bottom);
         } else if (frame.y < selectedFrame.y) {
           // These are all the canvases above the selected canvas
           // in the overview layout. Push them up out of frame.
-          frame.y = frame.y - (selectedFrame.vantage.bottomMargin + framePadding.top*2);
+          frame.y = frame.y - (selectedFrame.vantage.topMargin + framePadding.top);
         }
       });
     }
 
     frames = updateCanvases(frames);
     return frames;
+  }
+
+
+  var getFramesBoundingBox = function(frames) {
+
+    var maxX = -Infinity,
+        maxY = -Infinity,
+        minX = Infinity,
+        minY = Infinity;
+
+    frames.forEach(function(frame){
+      if ( frame.x < minX) minX = frame.x;
+      if ( frame.y < minY) minY = frame.y;
+      if ( frame.x + frame.width > maxX) {
+        maxX = frame.x + frame.width;
+      }
+      if ( frame.y + frame.height > maxY) {
+        maxY = frame.y + frame.height;
+      }
+    });
+
+    // Get a box that contains the topLeftmost
+    // topRightmost canvas of the selection.
+    // Will need to be updated for viewingDirections.
+
+    // Calculate a bounding box for the complete layout.
+    var layoutBBWidth = maxX + Math.abs(minX),
+        layoutBBHeight = maxY + Math.abs(minY);
+
+    return {
+      x: minX,
+      y: minY,
+      width: layoutBBWidth,
+      height: layoutBBHeight
+    };
+  };
+
+  function getCenter(frame) {
+    return {
+      x: frame.x + frame.width/2,
+      y: frame.y + frame.height/2
+    };
+  }
+
+  function getOverviewVantage(frames) {
+    // calculates the viewport dimensions
+    // that center the selected canvas in the
+    // overview layout.
+    var selectedFrame = frames.filter(function(frame) {
+      return frame.canvas.selected;
+    })[0],
+        selectedFrameCenter,
+        boundingBox = {
+          x: 0,
+          y: 0,
+          width: viewport.paddedWidth,
+          height: viewport.paddedHeight
+        },
+        vantage = padVantage(boundingBox);
+
+    if (selectedFrame) {
+      selectedFrameCenter = getCenter(selectedFrame);
+
+      // Consider adapting for another "clamp" function
+      // to keep the vantage within "viewport/layout" bounds.
+      var selectedVantageTop = selectedFrameCenter.y - vantage.height/2;
+      //     selectedVantageBottom = selectedFrameCenter + vantage.height/2,
+      //     selectedVantageLeft = selectedFrameCenter - vantage.width/2,
+      //     selectedVantageRight = selectedFrameCenter + vantage.width/2;
+
+      vantage.y = selectedVantageTop;
+      return vantage;
+    } else {
+      return vantage;
+    }
   }
 
   function getVantageForSelectedCanvas(frames) {
@@ -552,8 +632,8 @@ manifestLayout = function(options) {
         horizontalMargin,
         verticalMargin,
         minimumViewportPadding = 5; // units in % of the _viewport_ width/height.
-                                    // (as the case may be)
- if ((viewport.paddedAspectRatio >= boundingBoxAspectRatio)) {
+    // (as the case may be)
+    if ((viewport.paddedAspectRatio >= boundingBoxAspectRatio)) {
       // The primary dimension must be defined first, and the other
       // will be scaled according to the aspect ratio. In this case,
       // the viewport is wider than the canvas is tall. This means
@@ -626,6 +706,7 @@ manifestLayout = function(options) {
   }
 
   function padVantage(vantage) {
+    // These are "ratios" because they are given as a percent of the viewport.
     var horizontalPaddingRatio = viewport.padding.left + viewport.padding.right;
     var verticalPaddingRatio = viewport.padding.top + viewport.padding.bottom;
 
