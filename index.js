@@ -1,4 +1,14 @@
-/******/ (function(modules) { // webpackBootstrap
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else if(typeof exports === 'object')
+		exports["manifestLayout"] = factory();
+	else
+		root["manifestLayout"] = factory();
+})(this, function() {
+return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 
@@ -44,7 +54,7 @@
 /* 0 */
 /***/ function(module, exports) {
 
-	manifestLayout = function(options) {
+	export default function(options) {
 	  var maxCanvasHeight = options.maxCanvasHeight || 130, // screen pixels
 	      maxCanvasWidth = options.maxCanvasWidth ||  30, // screen pixels
 	      minCanvasWidth = options.minCanvasWidth ||  30,  // screen pixels
@@ -808,4 +818,6 @@
 
 
 /***/ }
-/******/ ]);
+/******/ ])
+});
+;

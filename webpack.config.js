@@ -4,7 +4,9 @@ module.exports = {
   entry: './src/main.js',
   output: {
     path: __dirname,
-    filename: 'index.js'
+    filename: 'index.js',
+    libraryTarget:'umd',
+    library: 'manifestLayout'
   },
   module: {
     loaders: [
