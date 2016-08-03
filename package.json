@@ -1,10 +1,20 @@
 {
-  "name": "iiif-constellations",
+  "name": "iiif-manifest-layout-functions",
   "version": "0.0.1",
   "description": "Pure layout functions for iiif sequences that arrange many canvases in space.",
-  "main": "index.js",
+  "main": "dist/iiif-manifest-layout-functions.js",
   "scripts": {
-    "test": "gulp test"
+    "serve": "webpack-dev-server",
+    "test": "jasmine",
+    "check-coverage": "nyc check-coverage --statements 100 --branches 100 --functions 100 --lines 100",
+    "report-coverage": "cat  ./coverage/lcov.info | codecov",
+    "cover": "nyc npm t",
+    "prebuild": "rimraf dist",
+    "build": "npm-run-all --parallel build:*",
+    "build:main": "babel --copy-files --out-dir dist --ignore *.test.js src",
+    "build:umd": "webpack --output-filename index.umd.js",
+    "build:umd.min": "webpack --output-filename index.umd.js",
+    "watch:test": "npm t -- --watch"
   },
   "repository": {
     "type": "git",
@@ -18,17 +28,33 @@
   ],
   "author": "aeschylus, edsilv",
   "license": "Apache-2.0",
+  "dependencies": {},
+  "devDependencies": {
+    "babel-core": "^6.8.0",
+    "babel-eslint": "^4.1.6",
+    "babel-istanbul": "^0.6.0",
+    "babel-istanbul-loader": "0.0.1",
+    "babel-loader": "^6.2.1",
+    "babel-plugin-add-module-exports": "^0.1.2",
+    "babel-preset-es2015": "^6.3.13",
+    "eslint": "^1.10.3",
+    "eslint-config-airbnb": "^3.1.0",
+    "etch": "https://github.com/edsilv/etch.git#dev",
+    "jasmine-core": "^2.4.1",
+    "karma": "^0.13.19",
+    "karma-chrome-launcher": "^0.2.2",
+    "karma-coverage": "^0.5.3",
+    "karma-jasmine": "^0.3.6",
+    "karma-sourcemap-loader": "^0.3.7",
+    "karma-webpack": "^1.7.0",
+    "loader-utils": "^0.2.12",
+    "npm-run-all": "2.3.0",
+    "nyc": "7.1.0",
+    "rimraf": "^2.5.0",
+    "webpack": "^1.13.0"
+  },
   "bugs": {
     "url": "https://github.com/sul-dlss/iiif-layout-functions/issues"
   },
-  "homepage": "https://github.com/sul-dlss/iiif-layout-functions#readme",
-  "dependencies": {
-  },
-  "devDependencies": {
-    "etch": "https://github.com/edsilv/etch.git#dev",
-    "babel-core": "^6.8.0",
-    "babel-loader": "^6.2.4",
-    "gulp": "^3.9.1",
-    "webpack": "^1.13.0"
-  }
+  "homepage": "https://github.com/sul-dlss/iiif-layout-functions#readme"
 }
