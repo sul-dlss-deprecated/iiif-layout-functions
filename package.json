@@ -1,8 +1,8 @@
 {
-  "name": "iiif-manifest-layout-functions",
-  "version": "0.0.1",
+  "name": "iiif-layout-functions",
+  "version": "0.0.1-alpha.1.2",
   "description": "Pure layout functions for iiif sequences that arrange many canvases in space.",
-  "main": "dist/iiif-manifest-layout-functions.js",
+  "main": "dist/iiif-layout-functions.js",
   "scripts": {
     "serve": "webpack-dev-server",
     "test": "jasmine",
@@ -12,8 +12,8 @@
     "prebuild": "rimraf dist",
     "build": "npm-run-all --parallel build:*",
     "build:main": "babel --copy-files --out-dir dist --ignore *.test.js src",
-    "build:umd": "webpack --output-filename index.umd.js",
-    "build:umd.min": "webpack --output-filename index.umd.js",
+    "build:umd": "webpack --output-filename dist/iiif-layout-functions.umd.js",
+    "build:umd.min": "webpack --output-filename dist/iiif-layout-functions.umd.min.js",
     "watch:test": "npm t -- --watch"
   },
   "repository": {
@@ -30,6 +30,7 @@
   "license": "Apache-2.0",
   "dependencies": {},
   "devDependencies": {
+    "babel-cli": "6.11.4",
     "babel-core": "^6.8.0",
     "babel-eslint": "^4.1.6",
     "babel-istanbul": "^0.6.0",
