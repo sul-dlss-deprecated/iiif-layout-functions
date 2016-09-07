@@ -306,7 +306,8 @@ var manifestLayout = function(options) {
      * @returns {Object} x, y
      */
     addItem: function(frame) {
-      var lineItemWidth = frame.width;
+      var lineItemWidth = frame.width,
+          output;
 
       if (viewingMode === 'paged') {
         var facingFrame = this._getFacingFrame(frame.canvas.sequencePosition);
@@ -319,20 +320,35 @@ var manifestLayout = function(options) {
         }
       }
 
-      if (this.x + lineItemWidth > this.lineWidth) {
-        this.x = 0;
-        this.y += frame.height;
+      if (viewingDirection === 'left-to-right') {
+        if (this.x + lineItemWidth > this.lineWidth) {
+          this.x = 0;
+          this.y += frame.height;
+        }
+
+        output = {
+          x: this.x,
+          y: this.y
+        };
+
+        this.x += frame.width;
       }
-
-      var output = {
-        x: this.x,
-        y: this.y
-      };
-
-      this.x += frame.width;
-
       if (viewingDirection === 'right-to-left') {
-        output.x = this.lineWidth - this.x;
+        if (this.x - lineItemWidth > this.lineWidth) {
+          this.x = 0;
+          this.y += frame.height;
+        }
+
+        output = {
+          x: this.lineWidth - (this.x - lineItemWidth),
+          y: this.y
+        };
+
+        this.x += frame.width;
+      }
+      if (viewingDirection === 'top-to-bottom') {
+      }
+      if (viewingDirection === 'bottom-to-top') {
       }
 
       return output;
@@ -380,7 +396,7 @@ var manifestLayout = function(options) {
     return frames;
   }
 
-  function overviewLayout(anchor) {
+  function overviewLayout() {
     // configure for viewingDirection, viewingMode, framing technique,
     // and alignment Style.
     var frames = bindCanvases(canvases.map(pruneCanvas).map(function(canvas) {
@@ -399,13 +415,11 @@ var manifestLayout = function(options) {
     return frames;
   }
 
-  function detailLayout(anchor) {
-    return detailLayoutHorizontal(anchor);
+  function detailLayout() {
+    return detailLayoutHorizontal();
   }
 
-  function detailLayoutHorizontal(anchor) {
-    // TODO: support viewingDirection and viewingMode
-
+  function detailLayoutHorizontal() {
     // configure for viewingDirection, viewingMode, framing technique,
     // and alignment Style.
     var frames = bindCanvases(canvases.map(pruneCanvas).map(function(canvas) {
@@ -416,22 +430,30 @@ var manifestLayout = function(options) {
     var x = 0;
     var y = 0;
 
-    frames.forEach(function(frame) {
-      frame.x = x;
-      frame.y = y;
-      x += frame.width;
-    });
-
-    // frames = alignToAnchor(frames, anchor);
-    updateCanvases(frames);
-    frames = intermediateLayoutHorizontal(frames);
+    if (viewingDirection === 'left-to-right') {
+      frames.forEach(function(frame) {
+        frame.x = x;
+        frame.y = y;
+        x += frame.width;
+      });
+      updateCanvases(frames);
+      frames = intermediateLayoutHorizontal(frames);
+    } else if (viewingDirection === 'right-to-left'){
+      frames.reverse().forEach(function(frame) {
+        frame.x = x;
+        frame.y = y;
+        x += frame.width;
+      });
+      updateCanvases(frames);
+      frames = intermediateLayoutHorizontal(frames.reverse());
+    }
     return frames;
   }
 
-  function intermediateLayout(anchor) {
+  function intermediateLayout() {
     // configure for viewingDirection, viewingMode,
     // and alignment Style (scaling).
-    return intermediateLayoutHorizontal(overviewLayout(anchor));
+    return intermediateLayoutHorizontal(overviewLayout());
   }
 
   function intermediateLayoutHorizontal(frames) {
@@ -450,13 +472,25 @@ var manifestLayout = function(options) {
           if (viewingMode === 'paged' && frame.canvas.id === facingCanvas.id) {
             return;
           }
-          // These are the canvases within the same line of the overview layout.
-          if (index < canvasPosition) {
-            // Those to the left. Push them to the left, out of frame.
-            frame.x = frame.x - (selectedFrame.vantage.leftMargin + framePadding.left);
-          } else {
-            // Those to the right. Push them to the right, out of frame.
-            frame.x = frame.x + (selectedFrame.vantage.rightMargin + framePadding.right);
+
+          if (viewingDirection === 'left-to-right') {
+            // These are the canvases within the same line of the overview layout.
+            if (index < canvasPosition) {
+              // Those to the left. Push them to the left, out of frame.
+              frame.x = frame.x - (selectedFrame.vantage.leftMargin + framePadding.left);
+            } else {
+              // Those to the right. Push them to the right, out of frame.
+              frame.x = frame.x + (selectedFrame.vantage.rightMargin + framePadding.right);
+            }
+          } else if (viewingDirection === 'right-to-left') {
+            // These are the canvases within the same line of the overview layout.
+            if (index > canvasPosition) {
+              // Those to the left. Push them to the left, out of frame.
+              frame.x = frame.x - (selectedFrame.vantage.leftMargin + framePadding.left);
+            } else {
+              // Those to the right. Push them to the right, out of frame.
+              frame.x = frame.x + (selectedFrame.vantage.rightMargin + framePadding.right);
+            }
           }
         } else if (frame.y > selectedFrame.y) {
           // These are all the canvases below the selected canvas
@@ -538,11 +572,12 @@ var manifestLayout = function(options) {
       // Consider adapting for another "clamp" function
       // to keep the vantage within "viewport/layout" bounds.
       var selectedVantageTop = selectedFrameCenter.y - vantage.height/2;
-      //     selectedVantageBottom = selectedFrameCenter + vantage.height/2,
-      //     selectedVantageLeft = selectedFrameCenter - vantage.width/2,
-      //     selectedVantageRight = selectedFrameCenter + vantage.width/2;
+          // selectedVantageBottom = selectedFrameCenter + vantage.height/2,
+          // selectedVantageLeft = selectedFrameCenter.x - vantage.width/2,
+          // selectedVantageRight = selectedFrameCenter + vantage.width/2;
 
-      vantage.y = selectedVantageTop;
+      vantage.x = 0;
+      vantage.y = (selectedVantageTop < 0) ? 0 : selectedVantageTop;
       return vantage;
     } else {
       return vantage;

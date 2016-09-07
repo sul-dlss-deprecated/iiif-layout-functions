@@ -54,25 +54,33 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports) {
 
-	module.exports = function(options) {
-	  var maxCanvasHeight = options.maxCanvasHeight || 130, // screen pixels
-	      maxCanvasWidth = options.maxCanvasWidth ||  30, // screen pixels
-	      minCanvasWidth = options.minCanvasWidth ||  30,  // screen pixels
-	      minCanvasHeight = options.minCanvasHeight ||  30,  // screen pixels
-	      canvasHeight = options.canvasHeight * options.scaleFactor ||  100,  // screen pixels
-	      canvasWidth = options.canvasWidth * options.scaleFactor ||  30,  // screen pixels
-	      scaleFactor = options.scaleFactor || 1,
+	var manifestLayout = function (options) {
+	  var maxCanvasHeight = options.maxCanvasHeight || 130,
+	      // screen pixels
+	  maxCanvasWidth = options.maxCanvasWidth || 30,
+	      // screen pixels
+	  minCanvasWidth = options.minCanvasWidth || 30,
+	      // screen pixels
+	  minCanvasHeight = options.minCanvasHeight || 30,
+	      // screen pixels
+	  canvasHeight = options.canvasHeight * options.scaleFactor || 100,
+	      // screen pixels
+	  canvasWidth = options.canvasWidth * options.scaleFactor || 30,
+	      // screen pixels
+	  scaleFactor = options.scaleFactor || 1,
 	      columns = options.columns || 8,
 	      framePadding = {
-	        top: options.framePadding.top || 0,
-	        bottom: options.framePadding.bottom || 0,
-	        left: options.framePadding.left || 0,
-	        right: options.framePadding.right || 0
-	      },
-	      facingCanvasPadding = options.facingCanvasPadding,  // screen pixels
-	      minimumImageGap = options.minimumImageGap,
-	      viewportPadding,     // screen pixels
-	      containerHeight = options.height,
+	    top: options.framePadding.top || 0,
+	    bottom: options.framePadding.bottom || 0,
+	    left: options.framePadding.left || 0,
+	    right: options.framePadding.right || 0
+	  },
+	      facingCanvasPadding = options.facingCanvasPadding,
+	      // screen pixels
+	  minimumImageGap = options.minimumImageGap,
+	      viewportPadding,
+	      // screen pixels
+	  containerHeight = options.height,
 	      containerWidth = options.width,
 	      canvases = options.canvases,
 	      selectedCanvas = options.selectedCanvas,
@@ -81,33 +89,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	      viewingMode = options.viewingMode || 'individuals',
 	      lineStrategy = options.viewingMode || 'grid',
 
-	      // Layout Constants
-	      // Storing strategies for specific states
-	      framingStrategies = {
-	        // different ways the canvas
-	        // will be forced into its canvas
-	        // or be allowed to shape its canvas
-	        contain: contain,
-	        // fitHeight: fitHeight,
-	        // fitWidth: fitHeight,
-	        hybrid: hybrid
-	      },
-	      // readingDirections = {
-	      // leftToRight: leftToRight,
-	      // rightToLeft: rightToLeft //,
-	      // topToBottom: ...,
-	      // bottomToTop: ...
-	      // },
-	      lineStrategies = {
-	        // fixedWidthColumns: fixedColumnLine,
-	        // fixedHeightRows: fixedHeightLine,
-	        grid: gridAlign
-	      },
+
+	  // Layout Constants
+	  // Storing strategies for specific states
+	  framingStrategies = {
+	    // different ways the canvas
+	    // will be forced into its canvas
+	    // or be allowed to shape its canvas
+	    contain: contain,
+	    // fitHeight: fitHeight,
+	    // fitWidth: fitHeight,
+	    hybrid: hybrid
+	  },
+
+	  // readingDirections = {
+	  // leftToRight: leftToRight,
+	  // rightToLeft: rightToLeft //,
+	  // topToBottom: ...,
+	  // bottomToTop: ...
+	  // },
+	  lineStrategies = {
+	    // fixedWidthColumns: fixedColumnLine,
+	    // fixedHeightRows: fixedHeightLine,
+	    grid: gridAlign
+	  },
 	      viewport = makeViewport(containerWidth, containerHeight, options.viewportPadding);
 
 	  function makeViewport(width, height, viewportPadding) {
-	    var horizontalMargin,
-	        verticalMargin;
+	    var horizontalMargin, verticalMargin;
 
 	    var viewport = {
 	      padding: viewportPadding || {
@@ -118,15 +127,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	      },
 	      width: width,
 	      height: height,
-	      aspectRatio: width/height
+	      aspectRatio: width / height
 	    };
 
-	    horizontalMargin = (viewport.padding.left + viewport.padding.right);
-	    verticalMargin = (viewport.padding.top + viewport.padding.bottom);
+	    horizontalMargin = viewport.padding.left + viewport.padding.right;
+	    verticalMargin = viewport.padding.top + viewport.padding.bottom;
 
-	    viewport.paddedWidth = width - width*(horizontalMargin/100);
-	    viewport.paddedHeight = height - height*(verticalMargin/100);
-	    viewport.paddedAspectRatio = viewport.paddedWidth/viewport.paddedHeight;
+	    viewport.paddedWidth = width - width * (horizontalMargin / 100);
+	    viewport.paddedHeight = height - height * (verticalMargin / 100);
+	    viewport.paddedAspectRatio = viewport.paddedWidth / viewport.paddedHeight;
 
 	    return viewport;
 	  }
@@ -138,7 +147,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      label: canvas.label,
 	      height: canvas.height,
 	      width: canvas.width,
-	      aspectRatio: canvas.width/canvas.height,
+	      aspectRatio: canvas.width / canvas.height,
 	      selected: canvas['@id'] === selectedCanvas ? true : false,
 	      sequencePosition: index
 	    };
@@ -176,8 +185,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // "portrait" or "landscape" view into which the object is scaled
 	    // depending on its aspect ratio bias.
 	    var portrait = canvas.aspectRatio <= 1.0 ? true : false,
-	        widthScaleFactor = canvasWidth/canvas.width,
-	        heightScaleFactor = canvasHeight/canvas.height;
+	        widthScaleFactor = canvasWidth / canvas.width,
+	        heightScaleFactor = canvasHeight / canvas.height;
 
 	    if (portrait) {
 	      fitHeight(canvas, canvasHeight);
@@ -190,24 +199,24 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  function fitHeight(canvas, canvasHeight) {
 	    var portrait = canvas.aspectRatio <= 1.0 ? true : false,
-	        scaleFactor = canvasHeight/canvas.height;
+	        scaleFactor = canvasHeight / canvas.height;
 
 	    canvas.height = canvasHeight;
 	    // we forced the height to fit, so the width
 	    // must be scaled according to the height.
-	    canvas.width = canvas.width*scaleFactor;
+	    canvas.width = canvas.width * scaleFactor;
 
 	    return canvas;
 	  }
 
 	  function fitWidth(canvas, canvasWidth) {
 	    var portrait = canvas.aspectRatio <= 1.0 ? true : false,
-	        scaleFactor = canvasHeight/canvas.width;
+	        scaleFactor = canvasHeight / canvas.width;
 
 	    canvas.width = canvasWidth;
 	    // we forced the width to fit, so the height
 	    // must be scaled according to the width.
-	    canvas.height = canvas.height*scaleFactor;
+	    canvas.height = canvas.height * scaleFactor;
 
 	    return canvas;
 	  }
@@ -232,22 +241,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  function gridAlign(frames, canvasHeight, canvasWidth, lineWidth) {
-	    var framesPerLine = Math.floor(lineWidth/canvasWidth),
+	    var framesPerLine = Math.floor(lineWidth / canvasWidth),
 	        framesLength = frames.length;
 
-	    return frames.map(function(frame, index) {
-	      var lineNumber = Math.floor((index)/framesPerLine),
-	          lineIndex = index%framesPerLine;
+	    return frames.map(function (frame, index) {
+	      var lineNumber = Math.floor(index / framesPerLine),
+	          lineIndex = index % framesPerLine;
 	      // The canvass must get their x and y properties
 	      // after the frame (the parent) props are set.
-	      frame.x = frame.width*lineIndex;
-	      frame.y = lineNumber*frame.height; // y determined by the line;
+	      frame.x = frame.width * lineIndex;
+	      frame.y = lineNumber * frame.height; // y determined by the line;
 
-	      frame.canvases.forEach(function(canvas, index) {
-	        canvas.localX = frame.leftPadding,
-	        canvas.localY = frame.topPadding,
-	        canvas.x = frame.x + frame.leftPadding,
-	        canvas.y = frame.y + frame.topPadding;
+	      frame.canvases.forEach(function (canvas, index) {
+	        canvas.localX = frame.leftPadding, canvas.localY = frame.topPadding, canvas.x = frame.x + frame.leftPadding, canvas.y = frame.y + frame.topPadding;
 	      });
 
 	      return frame;
@@ -257,9 +263,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function bindCanvases(canvases, viewingMode, viewingDirection, framePadding, facingCanvasPadding) {
 
 	    if (viewingMode === 'paged') {
-	      return canvases.filter(function(canvas) {
+	      return canvases.filter(function (canvas) {
 	        return canvas.viewingHint === 'non-paged' ? false : true;
-	      }).map(function(canvas, index) {
+	      }).map(function (canvas, index) {
 	        var boundPagePadding;
 
 	        if (index === 0) {
@@ -267,9 +273,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            top: framePadding.top,
 	            bottom: framePadding.bottom,
 	            left: framePadding.left,
-	            right: canvas.width * facingCanvasPadding/100/2
+	            right: canvas.width * facingCanvasPadding / 100 / 2
 	          };
-	          boundPagePadding.left = canvas.width + (facingCanvasPadding/100 * canvas.width);
+	          boundPagePadding.left = canvas.width + facingCanvasPadding / 100 * canvas.width;
 	          return frame(canvas, boundPagePadding);
 	        } else if ((index + 1) % 2 === 0) {
 	          // gets all even pages and makes
@@ -279,17 +285,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	            top: framePadding.top,
 	            bottom: framePadding.bottom,
 	            left: framePadding.left,
-	            right: canvas.width * facingCanvasPadding/100/2
+	            right: canvas.width * facingCanvasPadding / 100 / 2
 	          };
 
 	          return frame(canvas, boundPagePadding);
-
 	        } else {
 
 	          boundPagePadding = {
 	            top: framePadding.top,
 	            bottom: framePadding.bottom,
-	            left: canvas.width * facingCanvasPadding/100/2,
+	            left: canvas.width * facingCanvasPadding / 100 / 2,
 	            right: framePadding.right
 	          };
 
@@ -311,11 +316,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        left: 0,
 	        right: 0
 	      };
-	      return canvases.map(function(canvas){
+	      return canvases.map(function (canvas) {
 	        return frame(canvas, boundPagePadding);
 	      });
 	    } else {
-	      return canvases.map(function(canvas){
+	      return canvases.map(function (canvas) {
 	        return frame(canvas, framePadding);
 	      });
 	    }
@@ -328,14 +333,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function facingPageType(index) {
 	    if (index === 0) {
 	      return 'firstPage';
-	    } else if ((index % 2) === 0) {
+	    } else if (index % 2 === 0) {
 	      return 'rightPage';
 	    } else {
 	      return 'leftPage';
 	    }
 	  }
 
-	  var Lines = function(lineWidth, frames){
+	  var Lines = function (lineWidth, frames) {
 	    this.x = 0;
 	    this.y = 0;
 	    this.lineWidth = lineWidth;
@@ -343,7 +348,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Lines.prototype = {
-	    _getFacingFrame: function(index) {
+	    _getFacingFrame: function (index) {
 	      var type = facingPageType(index);
 
 	      if (type === 'leftPage') {
@@ -361,12 +366,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param frame
 	     * @returns {Object} x, y
 	     */
-	    addItem: function(frame) {
+	    addItem: function (frame) {
 	      var lineItemWidth = frame.width;
 
 	      if (viewingMode === 'paged') {
 	        var facingFrame = this._getFacingFrame(frame.canvas.sequencePosition);
-	        if(facingFrame){
+	        if (facingFrame) {
 	          if (facingFrame.canvas.sequencePosition > frame.canvas.sequencePosition) {
 	            lineItemWidth += facingFrame.width;
 	          } else {
@@ -398,7 +403,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function fixedHeightAlign(frames, lineWidth) {
 	    var lines = new Lines(lineWidth, frames);
 
-	    return frames.map(function(frame) {
+	    return frames.map(function (frame) {
 	      var lineStats = lines.addItem(frame);
 	      frame.x = lineStats.x;
 	      frame.y = lineStats.y;
@@ -412,14 +417,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var offsetX = 0;
 	    var offsetY = 0;
 
-	    frames.forEach(function(frame) {
+	    frames.forEach(function (frame) {
 	      if (frame.canvas.selected) {
 	        offsetX = anchor.x - (frame.x + frame.canvas.localX);
 	        offsetY = anchor.y - (frame.y + frame.canvas.localY);
 	      }
 	    });
 
-	    frames.forEach(function(frame) {
+	    frames.forEach(function (frame) {
 	      frame.x += offsetX;
 	      frame.y += offsetY;
 	    });
@@ -428,7 +433,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  function updateCanvases(frames) {
-	    frames.forEach(function(frame) {
+	    frames.forEach(function (frame) {
 	      frame.canvas.x = frame.x + frame.canvas.localX;
 	      frame.canvas.y = frame.y + frame.canvas.localY;
 	    });
@@ -436,10 +441,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return frames;
 	  }
 
-	  function overviewLayout(anchor) {
+	  function overviewLayout() {
+	    console.log('huruurururur');
 	    // configure for viewingDirection, viewingMode, framing technique,
 	    // and alignment Style.
-	    var frames = bindCanvases(canvases.map(pruneCanvas).map(function(canvas) {
+	    var frames = bindCanvases(canvases.map(pruneCanvas).map(function (canvas) {
 	      // resizes canvases for the chosen layout strategy.
 	      return fitHeight(canvas, canvasHeight);
 	    }), viewingMode, viewingDirection, framePadding, facingCanvasPadding);
@@ -447,7 +453,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    frames = fixedHeightAlign(frames, viewport.paddedWidth);
 	    // frames = alignToAnchor(frames, anchor);
 	    frames = updateCanvases(frames);
-	    var selectedFrame = frames.filter(function(frame) {
+	    var selectedFrame = frames.filter(function (frame) {
 	      return frame.canvas.selected;
 	    })[0];
 
@@ -464,7 +470,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    // configure for viewingDirection, viewingMode, framing technique,
 	    // and alignment Style.
-	    var frames = bindCanvases(canvases.map(pruneCanvas).map(function(canvas) {
+	    var frames = bindCanvases(canvases.map(pruneCanvas).map(function (canvas) {
 	      // resizes canvases for the chosen layout strategy.
 	      return fitHeight(canvas, canvasHeight);
 	    }), viewingMode, viewingDirection, framePadding, facingCanvasPadding);
@@ -472,7 +478,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var x = 0;
 	    var y = 0;
 
-	    frames.forEach(function(frame) {
+	    frames.forEach(function (frame) {
 	      frame.x = x;
 	      frame.y = y;
 	      x += frame.width;
@@ -491,7 +497,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  function intermediateLayoutHorizontal(frames) {
-	    var selectedFrame = frames.filter(function(frame) {
+	    var selectedFrame = frames.filter(function (frame) {
 	      return frame.canvas.selected;
 	    })[0];
 
@@ -500,7 +506,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    selectedFrame.vantage = getVantageForCanvas(selectedFrame.canvas, facingCanvas);
 
 	    if (viewingMode !== 'continuous') {
-	      frames.forEach(function(frame, index, allFrames) {
+	      frames.forEach(function (frame, index, allFrames) {
 	        // These canvases are on the same row as the selected canvas(es), but not selected.
 	        if (frame.y === selectedFrame.y && frame.canvas.id !== selectedFrame.canvas.id) {
 	          if (viewingMode === 'paged' && frame.canvas.id === facingCanvas.id) {
@@ -530,21 +536,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return frames;
 	  }
 
-
-	  var getFramesBoundingBox = function(frames) {
+	  var getFramesBoundingBox = function (frames) {
 
 	    var maxX = -Infinity,
 	        maxY = -Infinity,
 	        minX = Infinity,
 	        minY = Infinity;
 
-	    frames.forEach(function(frame){
-	      if ( frame.x < minX) minX = frame.x;
-	      if ( frame.y < minY) minY = frame.y;
-	      if ( frame.x + frame.width > maxX) {
+	    frames.forEach(function (frame) {
+	      if (frame.x < minX) minX = frame.x;
+	      if (frame.y < minY) minY = frame.y;
+	      if (frame.x + frame.width > maxX) {
 	        maxX = frame.x + frame.width;
 	      }
-	      if ( frame.y + frame.height > maxY) {
+	      if (frame.y + frame.height > maxY) {
 	        maxY = frame.y + frame.height;
 	      }
 	    });
@@ -567,8 +572,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  function getCenter(frame) {
 	    return {
-	      x: frame.x + frame.width/2,
-	      y: frame.y + frame.height/2
+	      x: frame.x + frame.width / 2,
+	      y: frame.y + frame.height / 2
 	    };
 	  }
 
@@ -576,16 +581,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // calculates the viewport dimensions
 	    // that center the selected canvas in the
 	    // overview layout.
-	    var selectedFrame = frames.filter(function(frame) {
+	    var selectedFrame = frames.filter(function (frame) {
 	      return frame.canvas.selected;
 	    })[0],
 	        selectedFrameCenter,
 	        boundingBox = {
-	          x: 0,
-	          y: 0,
-	          width: viewport.paddedWidth,
-	          height: viewport.paddedHeight
-	        },
+	      x: 0,
+	      y: 0,
+	      width: viewport.paddedWidth,
+	      height: viewport.paddedHeight
+	    },
 	        vantage = padVantage(boundingBox);
 
 	    if (selectedFrame) {
@@ -593,20 +598,23 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      // Consider adapting for another "clamp" function
 	      // to keep the vantage within "viewport/layout" bounds.
-	      var selectedVantageTop = selectedFrameCenter.y - vantage.height/2;
+	      var selectedVantageTop = selectedFrameCenter.y - vantage.height / 2;
 	      //     selectedVantageBottom = selectedFrameCenter + vantage.height/2,
-	      //     selectedVantageLeft = selectedFrameCenter - vantage.width/2,
+	      // selectedVantageLeft = selectedFrameCenter.x - vantage.width/2,
 	      //     selectedVantageRight = selectedFrameCenter + vantage.width/2;
 
-	      vantage.y = selectedVantageTop;
+	      vantage.x = 0;
+	      vantage.y = selectedVantageTop < 0 ? 0 : selectedVantageTop;
 	      return vantage;
 	    } else {
+	      vantage.x = 0;
+	      vantage.y = 0;
 	      return vantage;
 	    }
 	  }
 
 	  function getVantageForSelectedCanvas(frames) {
-	    var selectedFrame = frames.filter(function(frame) {
+	    var selectedFrame = frames.filter(function (frame) {
 	      return frame.canvas.selected;
 	    })[0];
 
@@ -628,9 +636,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        combinedCanvasWidths,
 	        x,
 	        pairHeight,
-	        // This requires calculating in units of the viewport pixels, and
-	        // converting them to the appropriate size.
-	        selectionBoundingBox = {};
+
+	    // This requires calculating in units of the viewport pixels, and
+	    // converting them to the appropriate size.
+	    selectionBoundingBox = {};
 
 	    // Set the selectionBoundingBox.width, portrait, and x values based on the
 	    // location of the paged frame.
@@ -644,13 +653,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      } else if (selectionIndex % 2 === 0) {
 	        // right page
 	        combinedCanvasWidths = selectedCanvas.width + facingCanvas.width;
-	        combinedCanvasWidths += ((facingCanvasPadding/100) * combinedCanvasWidths);
+	        combinedCanvasWidths += facingCanvasPadding / 100 * combinedCanvasWidths;
 	        x = facingCanvas.x;
 	        pairHeight = Math.max(selectedCanvas.height, facingCanvas.height);
 	      } else {
 	        // left page
 	        combinedCanvasWidths = selectedCanvas.width + facingCanvas.width;
-	        combinedCanvasWidths += ((facingCanvasPadding/100) * combinedCanvasWidths);
+	        combinedCanvasWidths += facingCanvasPadding / 100 * combinedCanvasWidths;
 	        x = selectedCanvas.x;
 	        pairHeight = Math.max(selectedCanvas.height, facingCanvas.height);
 	      }
@@ -689,7 +698,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        verticalMargin,
 	        minimumViewportPadding = 5; // units in % of the _viewport_ width/height.
 	    // (as the case may be)
-	    if ((viewport.paddedAspectRatio >= boundingBoxAspectRatio)) {
+	    if (viewport.paddedAspectRatio >= boundingBoxAspectRatio) {
 	      // The primary dimension must be defined first, and the other
 	      // will be scaled according to the aspect ratio. In this case,
 	      // the viewport is wider than the canvas is tall. This means
@@ -729,16 +738,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      //
 	      // or, more generally, the real calculation below:
 
-	      vantageHeight = (boundingBox.height*100)/(100-minimumViewportPadding*2);
+	      vantageHeight = boundingBox.height * 100 / (100 - minimumViewportPadding * 2);
 	      vantageWidth = vantageHeight * viewport.paddedAspectRatio;
 	      // The remaining dimension bears the same ratio to the primary dimension
 	      // that the corresponding side of the viewport does to its remaining side,
 	      // hence the aspectRatio (w/h). For width we multiply, as above, for
 	      // the height we divide, as below.
 	    } else {
-	      vantageWidth = (boundingBox.width*100)/(100-minimumViewportPadding*2);
-	      vantageHeight = vantageWidth / viewport.paddedAspectRatio;
-	    }
+	        vantageWidth = boundingBox.width * 100 / (100 - minimumViewportPadding * 2);
+	        vantageHeight = vantageWidth / viewport.paddedAspectRatio;
+	      }
 
 	    horizontalMargin = (vantageWidth - boundingBox.width) / 2;
 	    verticalMargin = (vantageHeight - boundingBox.height) / 2;
@@ -755,7 +764,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      topMargin: verticalMargin,
 	      bottomMargin: verticalMargin,
 	      leftMargin: horizontalMargin,
-	      rightMargin:horizontalMargin
+	      rightMargin: horizontalMargin
 	    };
 
 	    return padVantage(vantage);
@@ -766,18 +775,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var horizontalPaddingRatio = viewport.padding.left + viewport.padding.right;
 	    var verticalPaddingRatio = viewport.padding.top + viewport.padding.bottom;
 
-	    var paddedVantageWidth = (vantage.width*100)/(100-horizontalPaddingRatio);
-	    var paddedVantageHeight = (vantage.height*100)/(100-verticalPaddingRatio);
+	    var paddedVantageWidth = vantage.width * 100 / (100 - horizontalPaddingRatio);
+	    var paddedVantageHeight = vantage.height * 100 / (100 - verticalPaddingRatio);
 
 	    var paddedVantage = {
-	      x: vantage.x - (paddedVantageWidth*(viewport.padding.left/100)),
-	      y: vantage.y - (paddedVantageHeight*(viewport.padding.top/100)),
+	      x: vantage.x - paddedVantageWidth * (viewport.padding.left / 100),
+	      y: vantage.y - paddedVantageHeight * (viewport.padding.top / 100),
 	      width: paddedVantageWidth,
 	      height: paddedVantageHeight,
-	      topMargin: vantage.topMargin + (paddedVantageHeight*viewport.padding.top)/100,
-	      bottomMargin: vantage.bottomMargin + (paddedVantageHeight*viewport.padding.bottom)/100,
-	      leftMargin: vantage.leftMargin + (paddedVantageWidth*(viewport.padding.left/100)),
-	      rightMargin:vantage.rightMargin + (paddedVantageWidth*(viewport.padding.right/100))
+	      topMargin: vantage.topMargin + paddedVantageHeight * viewport.padding.top / 100,
+	      bottomMargin: vantage.bottomMargin + paddedVantageHeight * viewport.padding.bottom / 100,
+	      leftMargin: vantage.leftMargin + paddedVantageWidth * (viewport.padding.left / 100),
+	      rightMargin: vantage.rightMargin + paddedVantageWidth * (viewport.padding.right / 100)
 	    };
 
 	    return paddedVantage;
@@ -791,7 +800,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function getFacingCanvas(canvas, frames) {
 	    var selectedIndex;
 
-	    frames.forEach(function(frame, index) {
+	    frames.forEach(function (frame, index) {
 	      if (frame.canvas.id === canvas.id) {
 	        selectedIndex = index;
 	      }
@@ -802,9 +811,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    } else if (selectedIndex === frames.length - 1) {
 	      return frames[selectedIndex].canvas;
 	    } else if ((selectedIndex + 1) % 2 === 0) {
-	      return frames[selectedIndex+1].canvas;
+	      return frames[selectedIndex + 1].canvas;
 	    } else {
-	      return frames[selectedIndex-1].canvas;
+	      return frames[selectedIndex - 1].canvas;
 	    }
 	  }
 
@@ -814,8 +823,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    detail: detailLayout,
 	    viewport: viewport
 	  };
-	}
+	};
 
+	module.exports = manifestLayout;
 
 /***/ }
 /******/ ])
