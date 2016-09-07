@@ -1,6 +1,6 @@
 {
   "name": "iiif-layout-functions",
-  "version": "0.0.1-alpha.1.4",
+  "version": "0.0.2-alpha",
   "description": "Pure layout functions for iiif sequences that arrange many canvases in space.",
   "main": "dist/iiif-layout-functions.js",
   "scripts": {
