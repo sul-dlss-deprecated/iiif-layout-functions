@@ -197,9 +197,9 @@ $(function(){
         right: 10
       },
       viewportPadding: {
-        top: 0,
-        left: 0,
-        right: 0,
+        top: 10,
+        left: 10,
+        right: 10,
         bottom: 0
       },
       minimumImageGap: 5, // precent of viewport

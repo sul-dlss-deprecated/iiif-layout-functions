@@ -188,9 +188,9 @@ var manifestLayout = function(options) {
       frame.y = lineNumber*frame.height; // y determined by the line;
 
       frame.canvases.forEach(function(canvas, index) {
-        canvas.localX = frame.leftPadding,
-        canvas.localY = frame.topPadding,
-        canvas.x = frame.x + frame.leftPadding,
+        canvas.localX = frame.leftPadding;
+        canvas.localY = frame.topPadding;
+        canvas.x = frame.x + frame.leftPadding;
         canvas.y = frame.y + frame.topPadding;
       });
 
@@ -201,45 +201,87 @@ var manifestLayout = function(options) {
   function bindCanvases(canvases, viewingMode, viewingDirection, framePadding, facingCanvasPadding) {
 
     if (viewingMode === 'paged') {
-      return canvases.filter(function(canvas) {
+      var pages = canvases.filter(function(canvas) {
         return canvas.viewingHint === 'non-paged' ? false : true;
-      }).map(function(canvas, index) {
-        var boundPagePadding;
-
-        if (index === 0) {
-          boundPagePadding = {
-            top: framePadding.top,
-            bottom: framePadding.bottom,
-            left: framePadding.left,
-            right: canvas.width * facingCanvasPadding/100/2
-          };
-          boundPagePadding.left = canvas.width + (facingCanvasPadding/100 * canvas.width);
-          return frame(canvas, boundPagePadding);
-        } else if ((index + 1) % 2 === 0) {
-          // gets all even pages and makes
-          // their facing page the next page
-          // in the index.
-          boundPagePadding = {
-            top: framePadding.top,
-            bottom: framePadding.bottom,
-            left: framePadding.left,
-            right: canvas.width * facingCanvasPadding/100/2
-          };
-
-          return frame(canvas, boundPagePadding);
-
-        } else {
-
-          boundPagePadding = {
-            top: framePadding.top,
-            bottom: framePadding.bottom,
-            left: canvas.width * facingCanvasPadding/100/2,
-            right: framePadding.right
-          };
-
-          return frame(canvas, boundPagePadding);
-        }
       });
+      if (viewingDirection === 'left-to-right') {
+        return pages.map(function(canvas, index) {
+          var boundPagePadding;
+
+          if (index === 0) {
+            boundPagePadding = {
+              top: framePadding.top,
+              bottom: framePadding.bottom,
+              left: framePadding.left,
+              right: framePadding.right
+            };
+            boundPagePadding.left = canvas.width + (facingCanvasPadding/100 * canvas.width);
+            return frame(canvas, boundPagePadding);
+          } else if ((index + 1) % 2 === 0) {
+            // gets all even pages and makes
+            // their facing page the next page
+            // in the index.
+            boundPagePadding = {
+              top: framePadding.top,
+              bottom: framePadding.bottom,
+              left: framePadding.left,
+              right: canvas.width * facingCanvasPadding/100/2
+            };
+
+            return frame(canvas, boundPagePadding);
+
+          } else {
+
+            boundPagePadding = {
+              top: framePadding.top,
+              bottom: framePadding.bottom,
+              left: canvas.width * facingCanvasPadding/100/2,
+              right: framePadding.right
+            };
+
+            return frame(canvas, boundPagePadding);
+          }
+        });
+      }
+      if (viewingDirection === 'right-to-left') {
+        return pages.map(function(canvas, index) {
+          var boundPagePadding;
+
+          if (index === 0) {
+            boundPagePadding = {
+              top: framePadding.top,
+              bottom: framePadding.bottom,
+              left: framePadding.left,
+              right: canvas.width * facingCanvasPadding/100/2
+            };
+            boundPagePadding.left = canvas.width + (facingCanvasPadding/100 * canvas.width);
+            return frame(canvas, boundPagePadding);
+          } else if ((index + 1) % 2 === 0) {
+            // gets all even pages and makes
+            // their facing page the next page
+            // in the index.
+            boundPagePadding = {
+              top: framePadding.top,
+              bottom: framePadding.bottom,
+              left: framePadding.left,
+              right: canvas.width * facingCanvasPadding/100/2
+            };
+
+            return frame(canvas, boundPagePadding);
+
+          } else {
+
+            boundPagePadding = {
+              top: framePadding.top,
+              bottom: framePadding.bottom,
+              left: canvas.width * facingCanvasPadding/100/2,
+              right: framePadding.right
+            };
+
+            return frame(canvas, boundPagePadding);
+          }
+        });
+      }
     } else if (viewingMode === 'continuous') {
       // This just assumes we're talking horizontal.
       // As you can imagine, this is going to get out of
@@ -404,8 +446,9 @@ var manifestLayout = function(options) {
       return fitHeight(canvas, canvasHeight);
     }), viewingMode, viewingDirection, framePadding, facingCanvasPadding);
 
-    frames = fixedHeightAlign(frames, viewport.paddedWidth);
-    // frames = alignToAnchor(frames, anchor);
+    frames = addViewportPadding(
+      fixedHeightAlign(frames, viewport.paddedWidth)
+    );
     frames = updateCanvases(frames);
     var selectedFrame = frames.filter(function(frame) {
       return frame.canvas.selected;
@@ -550,6 +593,14 @@ var manifestLayout = function(options) {
     };
   }
 
+  function addViewportPadding(frames) {
+    return frames.map(function(frame) {
+      frame.x = frame.x + containerWidth*viewport.padding.left/100;
+      frame.y = frame.y + containerHeight*viewport.padding.top/100;
+      return frame;
+    });
+  }
+
   function getOverviewVantage(frames) {
     // calculates the viewport dimensions
     // that center the selected canvas in the
@@ -571,6 +622,8 @@ var manifestLayout = function(options) {
 
       // Consider adapting for another "clamp" function
       // to keep the vantage within "viewport/layout" bounds.
+      // This will need to also take into account the viewing
+      // direction.
       var selectedVantageTop = selectedFrameCenter.y - vantage.height/2;
           // selectedVantageBottom = selectedFrameCenter + vantage.height/2,
           // selectedVantageLeft = selectedFrameCenter.x - vantage.width/2,
@@ -724,7 +777,7 @@ var manifestLayout = function(options) {
 
     // This returned data is the representation of the viewport in
     // the coordinate system of the images and overlays (the "world")
-    // coordinates. OSD/D3, other rendering environments can use this
+    // coordinates. OSD, D3, or other rendering environments can use this
     // to position the camera.
     var vantage = {
       x: boundingBox.x - horizontalMargin,
@@ -761,11 +814,6 @@ var manifestLayout = function(options) {
 
     return paddedVantage;
   }
-
-  // Intended for framing any number of canvases (a range),
-  // instead of only two.
-  // function getBoundingBoxForCanvases(selectedCanvases) {
-  // }
 
   function getFacingCanvas(canvas, frames) {
     var selectedIndex;
