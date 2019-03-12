@@ -1,4 +1,4 @@
-# iiif-layout-functions
+# iiif-layout-functions ([demo](http://sul-dlss.github.io/iiif-layout-functions/example/))
 
 Iiif-layout-functions takes a set of IIIF Presentation Canvases and calculates a number of useful layouts for displaying them in a normalised coordinate system. Layouts are contingent upon parameters such as the viewing-hint, viewing-direction, and other UX considerations. The normalised x,y, width, and height coordinates can be consumed by any rendering context, providing separation of concerns for representing IIIF canvases to the end user. There are no events, DOM elements, or other runtime APIs foisted on the user for interacting with canvases. A list of canvases goes in, and raw numbers come out.
 
